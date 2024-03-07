@@ -16,8 +16,9 @@ const (
 )
 
 type Order struct {
-	Id      string
-	Address string
+	OrderID    string
+	CustomerID int
+	Address    string
 }
 
 type OutDate struct {
@@ -49,6 +50,15 @@ func PizzaOrderWorkflow(ctx workflow.Context, order Order) (OutDate, error) {
 	}
 	ctx = workflow.WithActivityOptions(ctx, options)
 
+	newSearchAttributes := map[string]interface{}{
+		"OrderID": order.OrderID,
+	}
+
+	err := workflow.UpsertSearchAttributes(ctx, newSearchAttributes)
+	if err != nil {
+		workflow.GetLogger(ctx).Error("Failed to upsert search attributes", "error", err)
+	}
+
 	currentStatus := OrderStatus{Status: "Принят", DeliveryTime: time.Time{}}
 
 	workflow.SetQueryHandler(ctx, QueryType, func() (OrderStatus, error) {
@@ -73,11 +83,11 @@ func PizzaOrderWorkflow(ctx workflow.Context, order Order) (OutDate, error) {
 	ctx = workflow.WithChildOptions(ctx, childWorkflowOptions)
 
 	doughDetails := doughPreparationDetails{
-		OrderID: order.Id,
+		OrderID: order.OrderID,
 	}
 
 	var doughResult doughPreparationResult
-	err := workflow.ExecuteChildWorkflow(ctx, PreparePizzaDoughWorkflow, doughDetails).Get(ctx, &doughResult)
+	err = workflow.ExecuteChildWorkflow(ctx, PreparePizzaDoughWorkflow, doughDetails).Get(ctx, &doughResult)
 	if err != nil {
 		log.Println("Ошибка при подготовке теста:", err)
 		return OutDate{}, err

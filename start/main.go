@@ -19,12 +19,13 @@ func main() {
 	defer c.Close()
 
 	options := client.StartWorkflowOptions{
-		ID:        "pizza-workflow-2",
+		ID:        "pizza-workflow",
 		TaskQueue: pizzaorder.TaskQueueName,
 	}
 
 	input := pizzaorder.Order{
-		Id: "O-547",
+		OrderID:    "O-547",
+		CustomerID: 50,
 	}
 
 	we, err := c.ExecuteWorkflow(context.Background(), options, pizzaorder.PizzaOrderWorkflow, input)

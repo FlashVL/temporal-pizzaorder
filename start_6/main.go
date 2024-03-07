@@ -29,7 +29,7 @@ func main() {
 		response, err := c.ListWorkflow(context.Background(), &workflowservice.ListWorkflowExecutionsRequest{
 			Namespace:     "default",
 			PageSize:      pageSize,
-			Query:         "WorkflowType='PizzaOrderWorkflow' and ExecutionStatus='Running'",
+			Query:         "OrderID='O-547'",
 			NextPageToken: nextPageToken,
 		})
 		if err != nil {
