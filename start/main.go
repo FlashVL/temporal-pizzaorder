@@ -19,7 +19,7 @@ func main() {
 	defer c.Close()
 
 	options := client.StartWorkflowOptions{
-		ID:        "pizza-workflow",
+		ID:        "pizza-workflow-2",
 		TaskQueue: pizzaorder.TaskQueueName,
 	}
 
